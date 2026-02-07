@@ -3,264 +3,232 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feelin' Baggy Photobooth</title>
+    <title>Feelin' Baggy • Photobooth</title>
     <style>
         :root {
-            --retro-pink: #ff71ce;
-            --retro-blue: #01cdfe;
-            --retro-dark: #2c5d63;
-            --retro-cream: #f9f4e8;
-            --booth-orange: #ff8c42;
+            --neon-pink: #ff00ff;
+            --neon-blue: #00f3ff;
+            --baggy-teal: #2c5d63;
+            --cream: #fefaf0;
+            --glass: rgba(255, 255, 255, 0.1);
         }
 
         body, html {
             margin: 0; padding: 0;
             height: 100%; width: 100%;
-            background-color: #1a1a1a;
-            font-family: 'Courier New', Courier, monospace;
+            background: #0a0a0a;
+            background-image: radial-gradient(var(--baggy-teal) 0.5px, transparent 0.5px);
+            background-size: 30px 30px;
+            font-family: 'Helvetica Neue', sans-serif;
+            color: white;
             overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            display: flex; justify-content: center; align-items: center;
         }
 
-        /* --- SCREEN WRAPPERS --- */
-        .screen {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            height: 100%;
-            position: absolute;
-        }
+        .screen { display: none; flex-direction: column; align-items: center; width: 100%; height: 100%; position: absolute; }
+        .active { display: flex; animation: fadeIn 0.5s ease; }
 
-        .active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* --- EXTERIOR VIEW --- */
+        /* --- EXTERIOR --- */
         #screen-exterior {
-            background: linear-gradient(var(--booth-orange), #d35400);
-            border: 20px solid #222;
-            box-sizing: border-box;
+            background: linear-gradient(135deg, #ff8c42, #ff00ff);
+            justify-content: center;
         }
 
-        .booth-sign {
-            background: #fff;
-            padding: 20px 40px;
-            border: 5px solid #333;
-            font-size: 3rem;
-            font-weight: bold;
-            color: #333;
-            box-shadow: 0 0 20px rgba(255,255,255,0.5);
-            margin-bottom: 50px;
+        .marquee {
+            font-size: 4rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            font-style: italic;
+            -webkit-text-stroke: 2px white;
+            color: transparent;
+            text-shadow: 5px 5px var(--baggy-teal);
+            margin-bottom: 30px;
         }
 
-        .curtain-door {
-            width: 200px;
-            height: 300px;
-            background: repeating-linear-gradient(90deg, #800000, #800000 20px, #a00000 40px);
-            border-radius: 10px 10px 0 0;
-            border: 5px solid #222;
+        /* --- INTERIOR --- */
+        .camera-container {
             position: relative;
+            border-radius: 40px;
+            padding: 15px;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 2px solid var(--neon-blue);
+            box-shadow: 0 0 30px var(--neon-blue);
         }
 
-        /* --- INTERIOR VIEW --- */
-        #screen-interior {
-            background-color: #333;
-            background-image: radial-gradient(#444 20%, transparent 20%);
-            background-size: 20px 20px;
-        }
-
-        .monitor-frame {
-            border: 15px solid #555;
+        /* CRT Scanline Effect */
+        .camera-container::after {
+            content: " ";
+            position: absolute; top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 4px, 3px 100%;
+            pointer-events: none;
             border-radius: 30px;
-            padding: 20px;
-            background: #222;
-            box-shadow: inset 0 0 50px #000;
         }
 
         video {
-            width: 400px;
-            height: 300px;
-            background: #000;
+            width: 500px;
+            height: 375px;
+            object-fit: cover;
+            border-radius: 25px;
             transform: scaleX(-1);
-            border: 2px solid var(--retro-blue);
         }
 
-        /* --- RESULTS VIEW --- */
-        #screen-results {
-            background: #111;
+        /* --- THE STRIP --- */
+        .strip-wrapper {
+            position: relative;
+            background: var(--cream);
+            padding: 20px;
+            width: 260px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            animation: stripDrop 1.2s cubic-bezier(0.23, 1, 0.32, 1);
         }
 
-        /* The Animation */
-        .falling-strip {
-            animation: slideDown 1.5s ease-out forwards;
-            background: var(--retro-cream);
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            box-shadow: 5px 5px 15px rgba(0,0,0,0.5);
-        }
-
-        @keyframes slideDown {
-            0% { transform: translateY(-1000px) rotate(-5deg); }
+        @keyframes stripDrop {
+            0% { transform: translateY(-120%) rotate(-10deg); }
             100% { transform: translateY(0) rotate(0deg); }
         }
 
-        .result-frame {
-            width: 150px;
-            height: 110px;
-            border: 2px solid #333;
-            background: #eee;
+        .photo-frame {
+            width: 100%;
+            height: 180px;
+            background: #ddd;
+            margin-bottom: 15px;
+            border: 1px solid #aaa;
+            overflow: hidden;
         }
 
-        .result-frame img { width: 100%; height: 100%; object-fit: cover; }
+        .photo-frame img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* THE OVERLAY LOGO */
+        .overlay-logo {
+            position: absolute;
+            top: 45%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 160px;
+            z-index: 10;
+            filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3));
+        }
 
         /* --- BUTTONS --- */
-        .btn {
-            margin-top: 20px;
-            padding: 15px 30px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            cursor: pointer;
+        .btn-pill {
+            background: white;
+            color: black;
             border: none;
-            background: var(--retro-pink);
-            color: white;
-            box-shadow: 4px 4px 0 var(--retro-blue);
+            padding: 18px 45px;
+            border-radius: 50px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
         }
 
-        .btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--retro-blue); }
+        .btn-pill:hover { transform: scale(1.05); background: var(--neon-blue); }
 
-        .logo-mid { width: 120px; display: block; margin: 5px auto; }
+        #snap-btn { background: var(--neon-pink); color: white; }
     </style>
 </head>
 <body>
 
     <div id="screen-exterior" class="screen active">
-        <div class="booth-sign">PHOTOGRAPHS</div>
-        <div class="curtain-door"></div>
-        <button class="btn" onclick="goToInterior()">ENTER BOOTH</button>
+        <div class="marquee">Feelin' Baggy</div>
+        <button class="btn-pill" onclick="enterBooth()">Enter Booth</button>
     </div>
 
     <div id="screen-interior" class="screen">
-        <div class="monitor-frame">
+        <div class="camera-container">
             <video id="video" autoplay playsinline></video>
         </div>
-        <div style="color: white; margin-top: 10px;">SHOTS: <span id="count">0</span> / 4</div>
-        <button id="snap-btn" class="btn" onclick="takePhoto()">SNAP PHOTO</button>
-        <button id="done-btn" class="btn" style="display:none; background: var(--retro-blue);" onclick="goToResults()">FINISH & PRINT</button>
+        <div style="margin-top: 20px; font-size: 1.5rem;" id="counter">SHOT 1/4</div>
+        <button id="snap-btn" class="btn-pill" onclick="takePhoto()">Snap</button>
+        <button id="done-btn" class="btn-pill" style="display:none;" onclick="showStrip()">Print Strip</button>
     </div>
 
     <div id="screen-results" class="screen">
-        <div id="strip-container" class="falling-strip">
-            <div class="result-frame" id="r1"></div>
-            <div class="result-frame" id="r2"></div>
-            <img src="logo.png" class="logo-mid" alt="Logo">
-            <div class="result-frame" id="r3"></div>
-            <div class="result-frame" id="r4"></div>
+        <div class="strip-wrapper" id="capture-area">
+            <div class="photo-frame" id="p1"></div>
+            <div class="photo-frame" id="p2"></div>
+            <img src="Artboard 1@3x.png" class="overlay-logo" alt="Logo">
+            <div class="photo-frame" id="p3"></div>
+            <div class="photo-frame" id="p4"></div>
         </div>
-        <div class="controls">
-            <button class="btn" onclick="downloadStrip()">DOWNLOAD PNG</button>
-            <button class="btn" style="background:#666;" onclick="location.reload()">RESTART</button>
+        <div style="display:flex;">
+            <button class="btn-pill" onclick="downloadImage()">Save to Phone</button>
+            <button class="btn-pill" style="background:#333; color:white;" onclick="location.reload()">Reset</button>
         </div>
     </div>
 
-    <canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
+    <canvas id="main-canvas" width="800" height="600" style="display:none;"></canvas>
 
     <script>
-        let photoData = [];
+        let photos = [];
         const video = document.getElementById('video');
 
-        function goToInterior() {
+        function enterBooth() {
             document.getElementById('screen-exterior').classList.remove('active');
             document.getElementById('screen-interior').classList.add('active');
-            initWebcam();
-        }
-
-        async function initWebcam() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                video.srcObject = stream;
-            } catch (err) {
-                alert("Please enable camera access!");
-            }
+            navigator.mediaDevices.getUserMedia({ video: true }).then(s => video.srcObject = s);
         }
 
         function takePhoto() {
-            if (photoData.length >= 4) return;
-
-            const canvas = document.getElementById('canvas');
+            if (photos.length >= 4) return;
+            const canvas = document.getElementById('main-canvas');
             const ctx = canvas.getContext('2d');
-            
-            // Mirror and draw
             ctx.translate(canvas.width, 0);
             ctx.scale(-1, 1);
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
             ctx.setTransform(1, 0, 0, 1, 0, 0);
 
             const data = canvas.toDataURL('image/png');
-            photoData.push(data);
+            photos.push(data);
             
-            // Update UI
-            document.getElementById('count').innerText = photoData.length;
-            
-            // Flash effect
-            video.style.opacity = 0;
-            setTimeout(() => video.style.opacity = 1, 100);
+            document.getElementById('p' + photos.length).innerHTML = `<img src="${data}">`;
+            document.getElementById('counter').innerText = `SHOT ${photos.length + 1}/4`;
 
-            if (photoData.length === 4) {
+            if (photos.length === 4) {
                 document.getElementById('snap-btn').style.display = 'none';
-                document.getElementById('done-btn').style.display = 'inline-block';
+                document.getElementById('done-btn').style.display = 'block';
             }
         }
 
-        function goToResults() {
+        function showStrip() {
             document.getElementById('screen-interior').classList.remove('active');
             document.getElementById('screen-results').classList.add('active');
-            
-            // Fill the strip
-            photoData.forEach((src, index) => {
-                const img = document.createElement('img');
-                img.src = src;
-                document.getElementById('r' + (index + 1)).appendChild(img);
-            });
         }
 
-        async function downloadStrip() {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = 400;
-            canvas.height = 1200;
+        async function downloadImage() {
+            const finalCanvas = document.createElement('canvas');
+            const fCtx = finalCanvas.getContext('2d');
+            finalCanvas.width = 500;
+            finalCanvas.height = 1400;
 
-            // Background
-            ctx.fillStyle = "#f9f4e8";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            const imgW = 360;
-            const imgH = 240;
-            const x = 20;
+            fCtx.fillStyle = "#fefaf0";
+            fCtx.fillRect(0,0,500,1400);
 
             for(let i=0; i<4; i++) {
                 const img = new Image();
-                img.src = photoData[i];
+                img.src = photos[i];
                 await img.decode();
-                let y = 20 + (i * (imgH + 20));
-                if (i >= 2) y += 100; // Space for logo
-                ctx.drawImage(img, x, y, imgW, imgH);
+                fCtx.drawImage(img, 25, 25 + (i * 330), 450, 310);
             }
 
-            // Draw Logo
+            // Draw Logo overlay on the final canvas
             const logo = new Image();
-            logo.src = 'logo.png';
+            logo.src = 'Artboard 1@3x.png';
             try {
                 await logo.decode();
-                ctx.drawImage(logo, 100, 560, 200, 60);
-            } catch(e) {}
+                fCtx.drawImage(logo, 100, 600, 300, 150);
+            } catch(e){}
 
             const link = document.createElement('a');
-            link.download = 'baggy-strip.png';
-            link.href = canvas.toDataURL();
+            link.download = 'baggy-vibe.png';
+            link.href = finalCanvas.toDataURL();
             link.click();
         }
     </script>
