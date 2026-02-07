@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feelin' Baggy • Retro Booth</title>
+    <title>Feelin' Baggy • Portrait Booth</title>
     <style>
         :root {
             --neon-pink: #ff00ff;
@@ -17,93 +17,96 @@
             margin: 0; padding: 0;
             height: 100%; width: 100%;
             font-family: 'Helvetica Neue', sans-serif;
-            overflow: hidden;
             background-color: #0a0a0a;
+            overflow: hidden;
+            display: flex; justify-content: center; align-items: center;
         }
 
-        /* 80s Grid Background */
         .bg-grid {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-image: linear-gradient(var(--baggy-teal) 1px, transparent 1px), linear-gradient(90deg, var(--baggy-teal) 1px, transparent 1px);
-            background-size: 50px 50px;
-            opacity: 0.2; z-index: -1;
+            background-size: 40px 40px;
+            opacity: 0.15; z-index: -1;
         }
 
-        .screen { display: none; flex-direction: column; align-items: center; width: 100%; height: 100%; position: absolute; justify-content: center; }
+        .screen { display: none; flex-direction: column; align-items: center; width: 100%; height: 100%; position: absolute; justify-content: center; padding: 20px; box-sizing: border-box; }
         .active { display: flex; }
 
-        .hero-title {
-            font-size: clamp(3rem, 15vw, 8rem);
-            font-weight: 900;
-            color: transparent;
-            -webkit-text-stroke: 2px var(--neon-blue);
-            text-shadow: 5px 5px var(--neon-pink);
-            text-transform: uppercase;
-            text-align: center;
-            transform: rotate(-3deg);
-            margin-bottom: 20px;
-        }
-
+        /* --- MONITOR --- */
         .monitor {
             position: relative;
-            border: 8px solid #333;
-            border-radius: 20px;
+            border: 6px solid #333;
+            border-radius: 15px;
             background: #000;
-            box-shadow: 0 0 40px var(--neon-blue);
-            width: 90%;
-            max-width: 640px;
+            box-shadow: 0 0 30px var(--neon-blue);
+            width: 100%;
+            max-width: 400px; /* Force Portrait Preview */
+            aspect-ratio: 3 / 4;
+            overflow: hidden;
         }
 
-        video { width: 100%; display: block; border-radius: 12px; transform: scaleX(-1); }
-
-        /* CRT Scanline Effect */
-        .scanlines {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%);
-            background-size: 100% 4px;
-            pointer-events: none;
-            z-index: 5;
+        video {
+            height: 100%;
+            width: auto;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%) scaleX(-1); /* Center crop and mirror */
         }
 
         #timer-overlay {
             position: absolute; top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 10rem; font-weight: 900;
+            font-size: 8rem; font-weight: 900;
             color: var(--retro-yellow);
-            text-shadow: 0 0 30px #000;
+            text-shadow: 0 0 20px #000;
             z-index: 100;
         }
 
-        #printing-ui { display: none; flex-direction: column; align-items: center; }
-        .progress-container { width: 300px; height: 20px; border: 2px solid var(--neon-blue); margin-top: 15px; }
-        .progress-bar { width: 0%; height: 100%; background: var(--neon-pink); transition: width 0.1s; }
-
+        /* --- STRIP --- */
         .strip-container {
             background: var(--cream);
-            padding: 15px;
-            width: 220px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+            padding: 10px;
+            width: 160px; /* Smaller strip */
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
             animation: stripSlideIn 1.2s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
         }
 
         @keyframes stripSlideIn { from { transform: translateY(-100%); } to { transform: translateY(0); } }
 
-        .photo-slot { width: 100%; height: 150px; background: #eee; margin-bottom: 10px; overflow: hidden; border: 1px solid #ddd; }
+        .photo-slot { 
+            width: 100%; 
+            height: 180px; /* Portrait Ratio */
+            background: #eee; 
+            margin-bottom: 8px; 
+            overflow: hidden; 
+            border: 1px solid #ddd; 
+        }
         .photo-slot img { width: 100%; height: 100%; object-fit: cover; }
 
-        .watermark { display: block; margin: 5px auto 15px auto; width: 70px; transform: rotate(-3deg); }
+        .watermark {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) rotate(-5deg);
+            width: 90px;
+            z-index: 10;
+            pointer-events: none;
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.3));
+        }
 
+        /* --- BUTTONS --- */
         .btn-glass {
             background: rgba(255,255,255,0.1);
             backdrop-filter: blur(10px);
             border: 2px solid white;
             color: white;
-            padding: 15px 40px;
+            padding: 12px 30px;
             border-radius: 50px;
             font-weight: bold;
             text-transform: uppercase;
             cursor: pointer;
-            margin-top: 25px;
+            margin-top: 15px;
+            font-size: 0.9rem;
         }
         .btn-glass:hover { background: white; color: black; }
 
@@ -116,22 +119,20 @@
     <div id="flash" class="flash-fx"></div>
 
     <div id="screen-exterior" class="screen active">
-        <div class="hero-title">FEELIN' BAGGY</div>
+        <h1 style="color: var(--neon-blue); text-transform: uppercase; letter-spacing: 5px; text-shadow: 3px 3px var(--neon-pink);">Feelin' Baggy</h1>
         <button class="btn-glass" onclick="initBooth()">ENTER BOOTH</button>
     </div>
 
     <div id="screen-interior" class="screen">
         <div class="monitor">
             <div id="timer-overlay"></div>
-            <div class="scanlines"></div>
             <video id="video" autoplay playsinline></video>
         </div>
-        <div id="status" style="margin-top: 20px; font-weight: bold; color: var(--neon-blue);">READY?</div>
+        <div id="status" style="margin-top: 15px; font-weight: bold; color: var(--neon-blue);">READY?</div>
         <button id="start-btn" class="btn-glass" onclick="runSession()">START 3s TIMER</button>
         
-        <div id="printing-ui">
-            <div style="color: var(--neon-pink); font-weight: bold; margin-top: 20px;">PRINTING...</div>
-            <div class="progress-container"><div id="bar" class="progress-bar"></div></div>
+        <div id="printing-ui" style="display:none; text-align:center;">
+            <div style="color: var(--neon-pink); font-weight: bold; margin-top: 10px;">PRINTING...</div>
         </div>
     </div>
 
@@ -143,37 +144,31 @@
             <div class="photo-slot" id="p3"></div>
             <div class="photo-slot" id="p4"></div>
         </div>
-        <div style="display: flex; gap: 10px;">
-            <button class="btn-glass" onclick="downloadPNG()">Download</button>
-            <button class="btn-glass" style="border-color: var(--neon-pink);" onclick="location.reload()">Restart</button>
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+            <button class="btn-glass" onclick="downloadPNG()">Save</button>
+            <button class="btn-glass" style="border-color: var(--neon-pink);" onclick="location.reload()">Retry</button>
         </div>
     </div>
 
-    <canvas id="hidden-canvas" width="800" height="600" style="display:none;"></canvas>
+    <canvas id="hidden-canvas" style="display:none;"></canvas>
 
     <script>
         const video = document.getElementById('video');
         const timer = document.getElementById('timer-overlay');
         const flash = document.getElementById('flash');
         const status = document.getElementById('status');
-        const bar = document.getElementById('bar');
         let capturedImages = [];
 
         async function initBooth() {
             try {
-                // Constraints set for best compatibility
-                const constraints = { video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } } };
-                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 1280, height: 720 } });
                 video.srcObject = stream;
-                
-                // Final check before switching screens
                 video.onloadedmetadata = () => {
                     document.getElementById('screen-exterior').classList.remove('active');
                     document.getElementById('screen-interior').classList.add('active');
                 };
             } catch (err) {
-                console.error(err);
-                alert("CAMERA ERROR: Please make sure you are using HTTPS and have granted camera permissions in your browser settings.");
+                alert("Please check camera permissions!");
             }
         }
 
@@ -182,31 +177,22 @@
             capturedImages = [];
 
             for (let i = 1; i <= 4; i++) {
-                status.innerText = `POSE FOR PHOTO ${i}/4`;
+                status.innerText = `GET READY: ${i}/4`;
                 await startCountdown(3);
                 
                 flash.style.display = 'block';
                 setTimeout(() => flash.style.display = 'none', 100);
                 
-                const data = takeSnap();
+                const data = takePortraitSnap();
                 capturedImages.push(data);
                 document.getElementById('p' + i).innerHTML = `<img src="${data}">`;
             }
 
-            status.style.display = 'none';
-            document.querySelector('.monitor').style.display = 'none';
-            document.getElementById('printing-ui').style.display = 'flex';
-            
-            let progress = 0;
-            const interval = setInterval(() => {
-                progress += 2;
-                bar.style.width = progress + '%';
-                if (progress >= 100) {
-                    clearInterval(interval);
-                    document.getElementById('screen-interior').classList.remove('active');
-                    document.getElementById('screen-results').classList.add('active');
-                }
-            }, 40);
+            document.getElementById('printing-ui').style.display = 'block';
+            setTimeout(() => {
+                document.getElementById('screen-interior').classList.remove('active');
+                document.getElementById('screen-results').classList.add('active');
+            }, 1500);
         }
 
         function startCountdown(sec) {
@@ -215,50 +201,63 @@
                 timer.innerText = count;
                 const clock = setInterval(() => {
                     count--;
-                    if (count <= 0) {
-                        clearInterval(clock);
-                        timer.innerText = "";
-                        res();
-                    } else {
-                        timer.innerText = count;
-                    }
+                    if (count <= 0) { clearInterval(clock); timer.innerText = ""; res(); }
+                    else { timer.innerText = count; }
                 }, 1000);
             });
         }
 
-        function takeSnap() {
+        function takePortraitSnap() {
             const canvas = document.getElementById('hidden-canvas');
             const ctx = canvas.getContext('2d');
+            
+            // Set canvas to Portrait (3:4 ratio)
+            canvas.width = 600;
+            canvas.height = 800;
+
+            // Calculate center crop from landscape video
+            const sourceWidth = video.videoWidth;
+            const sourceHeight = video.videoHeight;
+            const aspect = canvas.width / canvas.height;
+            let drawWidth = sourceHeight * aspect;
+            let drawHeight = sourceHeight;
+            let startX = (sourceWidth - drawWidth) / 2;
+
             ctx.translate(canvas.width, 0);
             ctx.scale(-1, 1);
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            ctx.drawImage(video, startX, 0, drawWidth, drawHeight, 0, 0, canvas.width, canvas.height);
             ctx.setTransform(1, 0, 0, 1, 0, 0);
+            
             return canvas.toDataURL('image/png');
         }
 
         async function downloadPNG() {
             const final = document.createElement('canvas');
             const fCtx = final.getContext('2d');
-            final.width = 400; final.height = 1100;
+            final.width = 400; final.height = 1000;
             fCtx.fillStyle = "#fefaf0";
-            fCtx.fillRect(0,0,400,1100);
+            fCtx.fillRect(0,0,final.width,final.height);
 
             for(let i=0; i<4; i++) {
                 const img = new Image();
                 img.src = capturedImages[i];
                 await img.decode();
-                fCtx.drawImage(img, 20, 20 + (i * 265), 360, 250);
+                fCtx.drawImage(img, 20, 20 + (i * 240), 360, 230);
             }
 
             const logo = new Image();
             logo.src = 'Artboard 1@3x.png';
             try {
                 await logo.decode();
-                fCtx.drawImage(logo, 160, 520, 80, 50);
+                fCtx.save();
+                fCtx.translate(200, 500);
+                fCtx.rotate(-0.1);
+                fCtx.drawImage(logo, -75, -50, 150, 100);
+                fCtx.restore();
             } catch(e) {}
 
             const link = document.createElement('a');
-            link.download = 'baggy-strip.png';
+            link.download = 'feelin-baggy-strip.png';
             link.href = final.toDataURL();
             link.click();
         }
