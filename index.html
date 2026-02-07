@@ -17,35 +17,25 @@
         body, html {
             margin: 0; padding: 0;
             height: 100%; width: 100%;
-            font-family: 'Inter', 'Helvetica Neue', sans-serif;
+            font-family: 'Helvetica Neue', sans-serif;
             background-color: #0a0a0a;
             color: white;
             overflow: hidden;
             display: flex; justify-content: center; align-items: center;
         }
 
-        /* 80s/90s Grid Background */
+        /* 80s Grid Background */
         .bg-grid {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-image: 
-                linear-gradient(var(--baggy-teal) 1px, transparent 1px),
-                linear-gradient(90deg, var(--baggy-teal) 1px, transparent 1px);
+            background-image: linear-gradient(var(--baggy-teal) 1px, transparent 1px), linear-gradient(90deg, var(--baggy-teal) 1px, transparent 1px);
             background-size: 50px 50px;
-            perspective: 500px;
-            z-index: -1;
-            opacity: 0.3;
+            opacity: 0.2; z-index: -1;
         }
 
         .screen { display: none; flex-direction: column; align-items: center; width: 100%; height: 100%; position: absolute; justify-content: center; }
-        .active { display: flex; animation: fadeIn 0.4s ease; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .active { display: flex; }
 
         /* --- EXTERIOR --- */
-        .marquee-container {
-            text-align: center;
-            transform: rotate(-3deg);
-        }
         .hero-title {
             font-size: clamp(3rem, 15vw, 8rem);
             font-weight: 900;
@@ -53,50 +43,81 @@
             -webkit-text-stroke: 2px var(--neon-blue);
             text-shadow: 5px 5px var(--neon-pink);
             text-transform: uppercase;
-            line-height: 0.9;
+            text-align: center;
+            transform: rotate(-3deg);
         }
 
         /* --- INTERIOR --- */
         .monitor {
             position: relative;
-            border: 4px solid var(--neon-blue);
+            border: 8px solid #333;
             border-radius: 20px;
-            padding: 10px;
-            background: black;
-            box-shadow: 0 0 40px rgba(0, 243, 255, 0.5);
-            overflow: hidden;
+            background: #000;
+            box-shadow: 0 0 30px var(--neon-blue);
+            width: 90%;
+            max-width: 640px;
         }
 
-        video { width: 100%; max-width: 600px; border-radius: 12px; transform: scaleX(-1); display: block; }
+        video {
+            width: 100%;
+            display: block;
+            border-radius: 12px;
+            transform: scaleX(-1); /* Mirror */
+        }
 
         #timer-overlay {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            font-size: 10rem; font-weight: 900; color: var(--retro-yellow);
-            text-shadow: 0 0 30px var(--neon-pink); z-index: 100; pointer-events: none;
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 10rem; font-weight: 900;
+            color: var(--retro-yellow);
+            text-shadow: 0 0 30px #000;
+            z-index: 100;
+            pointer-events: none;
         }
 
-        /* --- RESULTS --- */
+        /* --- PRINTING BAR --- */
+        #printing-ui {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .progress-container {
+            width: 300px;
+            height: 30px;
+            border: 3px solid var(--neon-blue);
+            padding: 3px;
+            margin-top: 20px;
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background: var(--neon-pink);
+            box-shadow: 0 0 15px var(--neon-pink);
+        }
+
+        /* --- STRIP --- */
         .strip-container {
             background: var(--cream);
             padding: 15px;
             width: 220px;
-            position: relative;
             box-shadow: 0 20px 60px rgba(0,0,0,0.8);
-            animation: stripSlideIn 1s cubic-bezier(0.23, 1, 0.32, 1);
+            animation: stripSlideIn 1.2s cubic-bezier(0.23, 1, 0.32, 1);
         }
 
         @keyframes stripSlideIn { from { transform: translateY(-100%); } to { transform: translateY(0); } }
 
-        .photo-slot { width: 100%; height: 150px; background: #222; margin-bottom: 10px; overflow: hidden; }
+        .photo-slot { width: 100%; height: 150px; background: #eee; margin-bottom: 10px; overflow: hidden; border: 1px solid #ddd; }
         .photo-slot img { width: 100%; height: 100%; object-fit: cover; }
 
         .watermark {
-            position: absolute; top: 48%; left: 50%;
-            transform: translate(-50%, -50%) rotate(-5deg);
-            width: 80px; z-index: 10;
+            display: block;
+            margin: 5px auto 15px auto;
+            width: 80px; /* 50% scale */
+            transform: rotate(-3deg);
         }
 
-        /* --- BUTTONS --- */
         .btn-glass {
             background: var(--glass);
             backdrop-filter: blur(10px);
@@ -108,12 +129,15 @@
             font-weight: bold;
             text-transform: uppercase;
             cursor: pointer;
-            transition: 0.3s;
-            margin-top: 20px;
+            margin-top: 25px;
         }
-        .btn-glass:hover { background: white; color: black; box-shadow: 0 0 20px white; }
 
-        .flash-fx { position: fixed; top:0; left:0; width:100%; height:100%; background: white; z-index: 1000; display: none; }
+        .btn-glass:hover { background: white; color: black; }
+
+        .flash-fx {
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            background: white; z-index: 1000; display: none;
+        }
     </style>
 </head>
 <body>
@@ -122,11 +146,8 @@
     <div id="flash" class="flash-fx"></div>
 
     <div id="screen-exterior" class="screen active">
-        <div class="marquee-container">
-            <div class="hero-title">FEELIN'</div>
-            <div class="hero-title" style="-webkit-text-stroke: 2px var(--neon-pink); text-shadow: 5px 5px var(--neon-blue);">BAGGY</div>
-        </div>
-        <button class="btn-glass" onclick="showInterior()">Enter Booth</button>
+        <div class="hero-title">FEELIN' BAGGY</div>
+        <button class="btn-glass" onclick="initBooth()">Enter Booth</button>
     </div>
 
     <div id="screen-interior" class="screen">
@@ -134,8 +155,15 @@
             <div id="timer-overlay"></div>
             <video id="video" autoplay playsinline></video>
         </div>
-        <div id="status" style="margin-top: 20px; font-weight: bold; letter-spacing: 2px;">READY?</div>
-        <button id="start-btn" class="btn-glass" onclick="runBoothSession()">START (3s TIMER)</button>
+        <div id="status" style="margin-top: 20px; font-weight: bold; color: var(--neon-blue);">READY?</div>
+        <button id="start-btn" class="btn-glass" onclick="runSession()">START 3s TIMER</button>
+        
+        <div id="printing-ui">
+            <div style="color: var(--neon-pink); font-weight: bold; margin-top: 20px;">PRINTING YOUR STRIP...</div>
+            <div class="progress-container">
+                <div id="bar" class="progress-bar"></div>
+            </div>
+        </div>
     </div>
 
     <div id="screen-results" class="screen">
@@ -147,78 +175,101 @@
             <div class="photo-slot" id="p4"></div>
         </div>
         <div style="display: flex; gap: 10px;">
-            <button class="btn-glass" onclick="downloadPNG()">Save PNG</button>
+            <button class="btn-glass" onclick="downloadPNG()">Download</button>
             <button class="btn-glass" style="border-color: var(--neon-pink);" onclick="location.reload()">Reset</button>
         </div>
     </div>
 
-    <canvas id="proc-canvas" width="800" height="600" style="display:none;"></canvas>
+    <canvas id="hidden-canvas" width="800" height="600" style="display:none;"></canvas>
 
     <script>
         const video = document.getElementById('video');
         const timer = document.getElementById('timer-overlay');
         const flash = document.getElementById('flash');
         const status = document.getElementById('status');
-        let captured = [];
+        const bar = document.getElementById('bar');
+        let capturedImages = [];
 
-        async function showInterior() {
-            document.getElementById('screen-exterior').classList.remove('active');
-            document.getElementById('screen-interior').classList.add('active');
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-            video.srcObject = stream;
+        // START WEBCAM
+        async function initBooth() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+                // Wait for video to actually start
+                video.onloadedmetadata = () => {
+                    document.getElementById('screen-exterior').classList.remove('active');
+                    document.getElementById('screen-interior').classList.add('active');
+                };
+            } catch (err) {
+                alert("Camera error: " + err.message);
+            }
         }
 
-        async function runBoothSession() {
+        // AUTO SESSION
+        async function runSession() {
             document.getElementById('start-btn').style.display = 'none';
-            captured = [];
+            capturedImages = [];
 
             for (let i = 1; i <= 4; i++) {
-                status.innerText = `POSE FOR ${i}/4`;
+                status.innerText = `GET READY: ${i}/4`;
                 await startCountdown(3);
-                doFlash();
-                const data = snap();
-                captured.push(data);
-                // Preview picture in the slot immediately
+                
+                // FLASH & SNAP
+                flash.style.display = 'block';
+                setTimeout(() => flash.style.display = 'none', 100);
+                
+                const data = takeSnap();
+                capturedImages.push(data);
                 document.getElementById('p' + i).innerHTML = `<img src="${data}">`;
             }
 
-            status.innerText = "DONE!";
-            setTimeout(() => {
-                document.getElementById('screen-interior').classList.remove('active');
-                document.getElementById('screen-results').classList.add('active');
-            }, 800);
+            // PRINTING ANIMATION
+            status.style.display = 'none';
+            document.querySelector('.monitor').style.display = 'none';
+            document.getElementById('printing-ui').style.display = 'flex';
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 5;
+                bar.style.width = progress + '%';
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    showResults();
+                }
+            }, 100);
         }
 
         function startCountdown(sec) {
             return new Promise(res => {
-                let current = sec;
-                timer.innerText = current;
-                const interval = setInterval(() => {
-                    current--;
-                    if (current <= 0) {
-                        clearInterval(interval);
+                let count = sec;
+                timer.innerText = count;
+                const clock = setInterval(() => {
+                    count--;
+                    if (count <= 0) {
+                        clearInterval(clock);
                         timer.innerText = "";
                         res();
                     } else {
-                        timer.innerText = current;
+                        timer.innerText = count;
                     }
                 }, 1000);
             });
         }
 
-        function doFlash() {
-            flash.style.display = 'block';
-            setTimeout(() => flash.style.display = 'none', 150);
-        }
-
-        function snap() {
-            const canvas = document.getElementById('proc-canvas');
+        function takeSnap() {
+            const canvas = document.getElementById('hidden-canvas');
             const ctx = canvas.getContext('2d');
+            // Mirror logic
             ctx.translate(canvas.width, 0);
             ctx.scale(-1, 1);
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
             ctx.setTransform(1, 0, 0, 1, 0, 0);
             return canvas.toDataURL('image/png');
+        }
+
+        function showResults() {
+            document.getElementById('screen-interior').classList.remove('active');
+            document.getElementById('screen-results').classList.add('active');
         }
 
         async function downloadPNG() {
@@ -230,7 +281,7 @@
 
             for(let i=0; i<4; i++) {
                 const img = new Image();
-                img.src = captured[i];
+                img.src = capturedImages[i];
                 await img.decode();
                 fCtx.drawImage(img, 20, 20 + (i * 265), 360, 250);
             }
@@ -239,7 +290,7 @@
             logo.src = 'Artboard 1@3x.png';
             try {
                 await logo.decode();
-                fCtx.drawImage(logo, 160, 520, 80, 50); // 50% scale
+                fCtx.drawImage(logo, 160, 520, 80, 50);
             } catch(e) {}
 
             const link = document.createElement('a');
