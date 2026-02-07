@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feelin' Baggy • Retro Booth</title>
+    <title>Feelin' Baggy • Auto Booth</title>
     <style>
         :root {
             --neon-pink: #ff00ff;
@@ -19,7 +19,6 @@
             font-family: 'Helvetica Neue', sans-serif;
             overflow: hidden;
             background-color: #1a1a1a;
-            /* 80s Memphis Pattern Background */
             background-image: 
                 radial-gradient(var(--neon-pink) 2px, transparent 2px),
                 linear-gradient(45deg, transparent 48%, var(--neon-blue) 50%, transparent 52%);
@@ -31,138 +30,107 @@
 
         @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-        /* --- EXTERIOR --- */
         #screen-exterior {
-            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://www.transparenttextures.com/patterns/cubes.png');
-            background-color: var(--baggy-teal);
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), 
+                        repeating-linear-gradient(90deg, #1a1a1a, #1a1a1a 40px, #222 40px, #222 80px);
         }
 
         .hero-title {
-            font-size: clamp(3rem, 10vw, 6rem);
+            font-size: clamp(3rem, 12vw, 7rem);
             font-weight: 900;
             color: var(--retro-yellow);
             text-shadow: 4px 4px 0px var(--neon-pink), 8px 8px 0px var(--neon-blue);
             text-transform: uppercase;
-            letter-spacing: -2px;
+            letter-spacing: -3px;
             margin-bottom: 20px;
             text-align: center;
+            transform: rotate(-2deg);
         }
 
-        /* --- INTERIOR --- */
         #screen-interior {
-            background: #222;
-            border: 15px solid #333; /* Booth Walls */
-            box-shadow: inset 0 0 100px #000;
+            background: var(--baggy-teal);
+            border: 20px solid #111;
+            outline: 5px solid var(--neon-pink);
+            box-shadow: inset 0 0 150px rgba(0,0,0,0.9);
         }
 
         .camera-ring {
             position: relative;
-            padding: 10px;
-            border-radius: 20px;
-            background: linear-gradient(var(--neon-blue), var(--neon-pink));
-            box-shadow: 0 0 50px rgba(0, 243, 255, 0.3);
-        }
-
-        video {
-            width: 480px;
-            height: 360px;
+            padding: 12px;
             background: #000;
-            border-radius: 10px;
-            transform: scaleX(-1);
-            display: block;
+            border: 2px solid var(--neon-blue);
+            box-shadow: 0 0 40px rgba(0, 243, 255, 0.4);
         }
 
-        /* Scanline Overlay */
-        .scanlines {
-            position: absolute; top:0; left:0; width:100%; height:100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-            background-size: 100% 3px, 3px 100%;
+        video { width: 520px; height: 390px; background: #000; transform: scaleX(-1); display: block; }
+
+        /* COUNTDOWN OVERLAY */
+        #timer-overlay {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 8rem;
+            font-weight: 900;
+            color: var(--retro-yellow);
+            text-shadow: 0 0 20px var(--neon-pink);
+            z-index: 100;
             pointer-events: none;
+            display: none;
         }
 
-        /* --- THE STRIP --- */
         .strip-drop {
             background: var(--cream);
             padding: 15px;
-            width: 220px;
+            width: 200px;
             position: relative;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
-            animation: fallIn 1.4s ease-out;
-            border-bottom: 4px dashed #ccc;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.9);
+            animation: fallIn 1.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        @keyframes fallIn { from { transform: translateY(-120%); } to { transform: translateY(0); } }
+        @keyframes fallIn { from { transform: translateY(-120%) rotate(-5deg); } to { transform: translateY(0) rotate(0deg); } }
 
-        .photo-slot {
-            width: 100%;
-            height: 150px;
-            background: #eee;
-            margin-bottom: 12px;
-            overflow: hidden;
-            border: 1px solid #ddd;
-        }
+        .photo-slot { width: 100%; height: 135px; background: #ddd; margin-bottom: 10px; overflow: hidden; }
+        .photo-slot img { width: 100%; height: 100%; object-fit: cover; filter: contrast(1.1) brightness(1.1); }
 
-        .photo-slot img { 
-            width: 100%; height: 100%; object-fit: cover; 
-            filter: contrast(1.1) brightness(1.05) saturate(1.2);
-        }
-
-        /* SMALL LOGO OVERLAY */
         .watermark-logo {
-            position: absolute;
-            top: 48%; /* Positioned between 2nd and 3rd pic */
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 80px; /* 50% Smaller than before */
-            z-index: 5;
-            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.2));
-            pointer-events: none;
+            position: absolute; top: 48%; left: 50%;
+            transform: translate(-50%, -50%) rotate(-5deg);
+            width: 70px; z-index: 10;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));
         }
 
-        /* --- BUTTONS --- */
         .btn-retro {
-            background: var(--retro-yellow);
-            color: #000;
-            border: 4px solid #000;
-            padding: 15px 40px;
-            font-size: 1.2rem;
-            font-weight: 900;
-            text-transform: uppercase;
-            cursor: pointer;
-            box-shadow: 6px 6px 0px #000;
-            transition: 0.1s;
+            background: var(--neon-pink); color: #fff; border: 4px solid #fff;
+            padding: 15px 40px; font-size: 1.1rem; font-weight: 900;
+            text-transform: uppercase; cursor: pointer;
+            box-shadow: 6px 6px 0px var(--neon-blue); margin: 10px;
         }
 
-        .btn-retro:hover { transform: translate(-2px, -2px); box-shadow: 8px 8px 0px #000; }
-        .btn-retro:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px #000; }
+        .flash { animation: flashAnim 0.2s ease-out; }
+        @keyframes flashAnim { 0% { background: white; } 100% { background: transparent; } }
 
-        .grain-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: url('https://www.transparenttextures.com/patterns/stardust.png');
-            opacity: 0.15; pointer-events: none; z-index: 100;
-        }
+        .grain { position: fixed; top:0; left:0; width:100%; height:100%; background: url('https://www.transparenttextures.com/patterns/stardust.png'); opacity: 0.15; pointer-events: none; z-index: 999; }
     </style>
 </head>
 <body>
 
-    <div class="grain-overlay"></div>
+    <div class="grain"></div>
 
     <div id="screen-exterior" class="screen active">
-        <div class="hero-title">Feelin'<br>Baggy</div>
-        <button class="btn-retro" onclick="startBooth()">Enter the Booth</button>
+        <div class="hero-title">FEELIN'<br>BAGGY</div>
+        <button class="btn-retro" onclick="startBooth()">Enter Booth</button>
     </div>
 
     <div id="screen-interior" class="screen">
+        <div id="flash-div" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:200; pointer-events:none;"></div>
         <div class="camera-ring">
+            <div id="timer-overlay">5</div>
             <video id="video" autoplay playsinline></video>
-            <div class="scanlines"></div>
         </div>
-        <div style="margin: 20px; font-weight: bold; color: var(--neon-blue); text-shadow: 2px 2px #000;">
-            CAPTURING: <span id="counter">0</span>/4
+        <div id="status-text" style="margin: 20px; color: var(--retro-yellow); font-weight:bold; letter-spacing:2px; height: 24px;">
+            READY?
         </div>
-        <button id="snap-btn" class="btn-retro" onclick="snap()">SNAP!</button>
-        <button id="print-btn" class="btn-retro" style="display:none; background: var(--neon-pink); color: white;" onclick="renderResults()">PRINT STRIP</button>
+        <button id="start-btn" class="btn-retro" onclick="startAutoSession()">START SESSION</button>
     </div>
 
     <div id="screen-results" class="screen">
@@ -173,10 +141,8 @@
             <div class="photo-slot" id="s3"></div>
             <div class="photo-slot" id="s4"></div>
         </div>
-        <div style="margin-top: 30px; display: flex; gap: 15px;">
-            <button class="btn-retro" style="background: var(--neon-blue);" onclick="downloadStrip()">SAVE PNG</button>
-            <button class="btn-retro" style="background: #eee;" onclick="location.reload()">AGAIN?</button>
-        </div>
+        <button class="btn-retro" style="background: var(--neon-blue); margin-top:30px;" onclick="downloadStrip()">SAVE STRIP</button>
+        <button class="btn-retro" style="background: #333;" onclick="location.reload()">RESTART</button>
     </div>
 
     <canvas id="hidden-canvas" width="600" height="450" style="display:none;"></canvas>
@@ -184,6 +150,8 @@
     <script>
         let photos = [];
         const video = document.getElementById('video');
+        const timerOverlay = document.getElementById('timer-overlay');
+        const statusText = document.getElementById('status-text');
 
         function startBooth() {
             document.getElementById('screen-exterior').classList.remove('active');
@@ -191,8 +159,43 @@
             navigator.mediaDevices.getUserMedia({ video: true }).then(s => video.srcObject = s);
         }
 
-        function snap() {
-            if (photos.length >= 4) return;
+        async function startAutoSession() {
+            document.getElementById('start-btn').style.display = 'none';
+            photos = [];
+            
+            for (let i = 1; i <= 4; i++) {
+                await runCountdown(5, i);
+                capturePhoto(i);
+            }
+            
+            statusText.innerText = "PRINTING...";
+            setTimeout(() => {
+                document.getElementById('screen-interior').classList.remove('active');
+                document.getElementById('screen-results').classList.add('active');
+            }, 1000);
+        }
+
+        function runCountdown(seconds, photoNum) {
+            return new Promise(resolve => {
+                let count = seconds;
+                timerOverlay.style.display = 'block';
+                timerOverlay.innerText = count;
+                statusText.innerText = `GET READY FOR PHOTO ${photoNum}/4`;
+
+                const interval = setInterval(() => {
+                    count--;
+                    if (count <= 0) {
+                        clearInterval(interval);
+                        timerOverlay.style.display = 'none';
+                        resolve();
+                    } else {
+                        timerOverlay.innerText = count;
+                    }
+                }, 1000);
+            });
+        }
+
+        function capturePhoto(index) {
             const canvas = document.getElementById('hidden-canvas');
             const ctx = canvas.getContext('2d');
             ctx.translate(canvas.width, 0);
@@ -202,43 +205,38 @@
 
             const data = canvas.toDataURL('image/png');
             photos.push(data);
+            document.getElementById('s' + index).innerHTML = `<img src="${data}">`;
             
-            document.getElementById('s' + photos.length).innerHTML = `<img src="${data}">`;
-            document.getElementById('counter').innerText = photos.length;
-
-            if (photos.length === 4) {
-                document.getElementById('snap-btn').style.display = 'none';
-                document.getElementById('print-btn').style.display = 'block';
-            }
-        }
-
-        function renderResults() {
-            document.getElementById('screen-interior').classList.remove('active');
-            document.getElementById('screen-results').classList.add('active');
+            // Visual Flash
+            const flash = document.getElementById('flash-div');
+            flash.classList.remove('flash');
+            void flash.offsetWidth; // Trigger reflow
+            flash.classList.add('flash');
         }
 
         async function downloadStrip() {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
-            canvas.width = 440;
-            canvas.height = 1200;
-
-            ctx.fillStyle = "#fefaf0"; // Cream background
-            ctx.fillRect(0,0,440,1200);
+            canvas.width = 400; canvas.height = 1100;
+            ctx.fillStyle = "#fefaf0";
+            ctx.fillRect(0,0,400,1100);
 
             for(let i=0; i<4; i++) {
                 const img = new Image();
                 img.src = photos[i];
                 await img.decode();
-                ctx.drawImage(img, 20, 20 + (i * 290), 400, 280);
+                ctx.drawImage(img, 20, 20 + (i * 265), 360, 250);
             }
 
-            // Draw Logo 50% smaller
             const logo = new Image();
             logo.src = 'Artboard 1@3x.png';
             try {
                 await logo.decode();
-                ctx.drawImage(logo, 145, 530, 150, 80); // Scaled down
+                ctx.save();
+                ctx.translate(200, 550);
+                ctx.rotate(-0.1);
+                ctx.drawImage(logo, -60, -35, 120, 70);
+                ctx.restore();
             } catch(e){}
 
             const link = document.createElement('a');
