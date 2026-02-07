@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>80s Retro Photobooth</title>
+    <style>
+        :root {
+            --retro-pink: #ff71ce;
+            --retro-blue: #01cdfe;
+            --retro-dark: #2c5d63;
+            --retro-cream: #f9f4e8;
+        }
+
+        body {
+            background-color: #1a1a1a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: 'Courier New', Courier, monospace;
+            color: var(--retro-pink);
+            padding: 20px;
+        }
+
+        h1 {
+            text-shadow: 3px 3px var(--retro-blue);
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            text-align: center;
+        }
+
+        #container {
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        /* Live Camera Feed */
+        .camera-box {
+            border: 10px double var(--retro-blue);
+            padding: 15px;
+            background: #000;
+            text-align: center;
+        }
+
+        video {
+            width: 320px;
+            height: 240px;
+            transform: scaleX(-1);
+            display: block;
+            border: 2px solid #333;
+        }
+
+        /* The Film Strip Display */
+        #photo-strip {
+            background-color: var(--retro-cream);
+            padding: 20px;
+            box-shadow: 12px 12px 0px var(--retro-dark);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            width: 240px;
+        }
+
+        .frame {
+            width: 220px;
+            height: 165px;
+            background: #e0e0e0;
+            border: 3px solid #111;
+            overflow: hidden;
+        }
+
+        .frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .logo-slot {
+            width: 180px;
+            margin: 10px 0;
+        }
+
+        .controls {
+            margin-top: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        button {
+            background: var(--retro-pink);
+            border: none;
+            padding: 15px 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 5px 5px 0px var(--retro-blue);
+            transition: 0.1s;
+            color: #fff;
+        }
+
+        button:hover { background: #ff85d5; }
+
+        button:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px var(--retro-blue);
+        }
+
+        #download-btn {
+            background: var(--retro-blue);
+            box-shadow: 5px 5px 0px var(--retro-pink);
+            display: none; /* Only show when strip is full */
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Feelin' Baggy Booth</h1>
+
+    <div id="container">
+        <div class="camera-box">
+            <video id="video" autoplay playsinline></video>
+            <div class="controls">
+                <button id="snap">TAKE PHOTO (<span id="count">0</span>/4)</button>
+                <button id="download-btn">DOWNLOAD STRIP</button>
+            </div>
+        </div>
+
+        <div id="photo-strip">
+            <div class="frame" id="f1"></div>
+            <div class="frame" id="f2"></div>
+            <img src="Artboard 1@3x.png" id="logo-img" class="logo-slot" alt="Logo">
+            <div class="frame" id="f3"></div>
+            <div class="frame" id="f4"></div>
+        </div>
+    </div>
+
+    <canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const snapBtn = document.getElementById('snap');
+        const downloadBtn = document.getElementById('download-btn');
+        const countDisplay = document.getElementById('count');
+        const logoImg = document.getElementById('logo-img');
+        
+        const frames = [
+            document.getElementById('f1'),
+            document.getElementById('f2'),
+            document.getElementById('f3'),
+            document.getElementById('f4')
+        ];
+        
+        let photoData = [];
+
+        async function initWebcam() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+            } catch (err) {
+                alert("Webcam access denied.");
+            }
+        }
+
+        snapBtn.addEventListener('click', () => {
+            if (photoData.length >= 4) {
+                photoData = [];
+                frames.forEach(f => f.innerHTML = '');
+                downloadBtn.style.display = 'none';
+            }
+
+            const ctx = canvas.getContext('2d');
+            ctx.translate(canvas.width, 0);
+            ctx.scale(-1, 1);
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+            const data = canvas.toDataURL('image/png');
+            photoData.push(data);
+            
+            const img = document.createElement('img');
+            img.src = data;
+            frames[photoData.length - 1].appendChild(img);
+            
+            countDisplay.innerText = photoData.length;
+
+            if (photoData.length === 4) {
+                downloadBtn.style.display = 'block';
+                snapBtn.innerText = "RESET BOOTH";
+            } else {
+                snapBtn.innerHTML = `TAKE PHOTO (<span id="count">${photoData.length}</span>/4)`;
+            }
+        });
+
+        downloadBtn.addEventListener('click', () => {
+            const stripCanvas = document.createElement('canvas');
+            const sCtx = stripCanvas.getContext('2d');
+            
+            // Layout Settings
+            const w = 400; // width of strip
+            const h = 1300; // height of strip
+            const padding = 20;
+            const imgW = w - (padding * 2);
+            const imgH = 225;
+            
+            stripCanvas.width = w;
+            stripCanvas.height = h;
+
+            // Background
+            sCtx.fillStyle = "#f9f4e8";
+            sCtx.fillRect(0, 0, w, h);
+
+            // Function to draw each photo and logo
+            const drawStrip = async () => {
+                for (let i = 0; i < 4; i++) {
+                    const img = new Image();
+                    img.src = photoData[i];
+                    await img.decode();
+                    
+                    // Logic to jump over the logo space after the 2nd photo
+                    let yPos = padding + (i * (imgH + padding));
+                    if (i >= 2) yPos += 150; // Leave 150px for logo
+
+                    sCtx.strokeStyle = "#111";
+                    sCtx.lineWidth = 4;
+                    sCtx.strokeRect(padding, yPos, imgW, imgH);
+                    sCtx.drawImage(img, padding, yPos, imgW, imgH);
+                }
+
+                // Draw Logo
+                try {
+                    const logo = new Image();
+                    logo.src = logoImg.src;
+                    await logo.decode();
+                    const logoY = padding + (2 * (imgH + padding)) - 130;
+                    sCtx.drawImage(logo, padding + 20, logoY, imgW - 40, 100);
+                } catch(e) { console.log("Logo load failed for download"); }
+
+                // Trigger Download
+                const link = document.createElement('a');
+                link.download = 'baggy-photostrip.png';
+                link.href = stripCanvas.toDataURL();
+                link.click();
+            };
+
+            drawStrip();
+        });
+
+        initWebcam();
+    </script>
+</body>
+</html>
