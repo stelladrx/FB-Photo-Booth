@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feelin' Baggy • Portrait Booth</title>
+    <title>Feelin' Baggy • Retro Portrait Booth</title>
     <style>
         :root {
             --neon-pink: #ff00ff;
@@ -17,110 +17,128 @@
             margin: 0; padding: 0;
             height: 100%; width: 100%;
             font-family: 'Helvetica Neue', sans-serif;
-            background-color: #0a0a0a;
+            background-color: #1a1a1a;
             overflow: hidden;
             display: flex; justify-content: center; align-items: center;
         }
 
-        .bg-grid {
+        /* 80s Grain & Grid Overlay */
+        .grain-texture {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-image: linear-gradient(var(--baggy-teal) 1px, transparent 1px), linear-gradient(90deg, var(--baggy-teal) 1px, transparent 1px);
-            background-size: 40px 40px;
-            opacity: 0.15; z-index: -1;
+            background: url('https://www.transparenttextures.com/patterns/stardust.png');
+            opacity: 0.15; pointer-events: none; z-index: 1000;
         }
 
-        .screen { display: none; flex-direction: column; align-items: center; width: 100%; height: 100%; position: absolute; justify-content: center; padding: 20px; box-sizing: border-box; }
-        .active { display: flex; }
+        .bg-grid {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(var(--baggy-teal) 1px, transparent 1px),
+                linear-gradient(90deg, var(--baggy-teal) 1px, transparent 1px);
+            background-size: 30px 30px;
+            opacity: 0.2; z-index: -1;
+        }
 
-        /* --- MONITOR --- */
+        .screen { display: none; flex-direction: column; align-items: center; width: 100%; height: 100%; position: absolute; justify-content: center; padding: 10px; box-sizing: border-box; }
+        .active { display: flex; animation: fadeIn 0.5s ease; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* --- UI ELEMENTS --- */
+        .hero-title {
+            font-size: clamp(2.5rem, 10vw, 5rem);
+            font-weight: 900;
+            color: var(--retro-yellow);
+            text-shadow: 3px 3px var(--neon-pink), -2px -2px var(--neon-blue);
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            transform: rotate(-2deg);
+        }
+
         .monitor {
             position: relative;
-            border: 6px solid #333;
-            border-radius: 15px;
+            border: 5px solid #fff;
+            border-radius: 10px;
             background: #000;
             box-shadow: 0 0 30px var(--neon-blue);
             width: 100%;
-            max-width: 400px; /* Force Portrait Preview */
+            max-width: 320px;
             aspect-ratio: 3 / 4;
             overflow: hidden;
         }
 
         video {
-            height: 100%;
-            width: auto;
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%) scaleX(-1); /* Center crop and mirror */
+            height: 100%; width: auto;
+            position: absolute; left: 50%;
+            transform: translateX(-50%) scaleX(-1);
+            filter: contrast(1.1) brightness(1.1);
         }
 
         #timer-overlay {
             position: absolute; top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 8rem; font-weight: 900;
+            font-size: 7rem; font-weight: 900;
             color: var(--retro-yellow);
-            text-shadow: 0 0 20px #000;
             z-index: 100;
+            pointer-events: none;
         }
 
-        /* --- STRIP --- */
+        /* --- THE STRIP --- */
         .strip-container {
             background: var(--cream);
-            padding: 10px;
-            width: 160px; /* Smaller strip */
+            padding: 8px;
+            width: 140px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.8);
-            animation: stripSlideIn 1.2s cubic-bezier(0.23, 1, 0.32, 1);
             position: relative;
+            transform: rotate(1deg);
         }
-
-        @keyframes stripSlideIn { from { transform: translateY(-100%); } to { transform: translateY(0); } }
 
         .photo-slot { 
-            width: 100%; 
-            height: 180px; /* Portrait Ratio */
-            background: #eee; 
-            margin-bottom: 8px; 
-            overflow: hidden; 
-            border: 1px solid #ddd; 
+            width: 100%; height: 160px; 
+            background: #222; margin-bottom: 6px; 
+            overflow: hidden; border: 1px solid #ccc;
         }
-        .photo-slot img { width: 100%; height: 100%; object-fit: cover; }
 
-        .watermark {
+        .photo-slot img { 
+            width: 100%; height: 100%; object-fit: cover; 
+            filter: sepia(0.1) contrast(1.1) saturate(1.2);
+        }
+
+        .sticker-logo {
             position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%) rotate(-5deg);
-            width: 90px;
-            z-index: 10;
-            pointer-events: none;
-            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.3));
+            top: 48%; left: 50%;
+            transform: translate(-50%, -50%) rotate(-8deg);
+            width: 60px; /* Smaller sticker */
+            z-index: 20;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
         }
 
         /* --- BUTTONS --- */
-        .btn-glass {
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            border: 2px solid white;
+        .btn-retro {
+            background: var(--neon-pink);
             color: white;
-            padding: 12px 30px;
-            border-radius: 50px;
+            border: 3px solid white;
+            padding: 12px 25px;
             font-weight: bold;
             text-transform: uppercase;
             cursor: pointer;
-            margin-top: 15px;
-            font-size: 0.9rem;
+            margin: 10px;
+            box-shadow: 4px 4px 0px var(--neon-blue);
+            transition: 0.1s;
         }
-        .btn-glass:hover { background: white; color: black; }
+        .btn-retro:active { transform: translate(2px, 2px); box-shadow: 0px 0px 0px; }
 
-        .flash-fx { position: fixed; top:0; left:0; width:100%; height:100%; background: white; z-index: 1000; display: none; }
+        .flash-fx { position: fixed; top:0; left:0; width:100%; height:100%; background: white; z-index: 2000; display: none; }
     </style>
 </head>
 <body>
 
+    <div class="grain-texture"></div>
     <div class="bg-grid"></div>
     <div id="flash" class="flash-fx"></div>
 
     <div id="screen-exterior" class="screen active">
-        <h1 style="color: var(--neon-blue); text-transform: uppercase; letter-spacing: 5px; text-shadow: 3px 3px var(--neon-pink);">Feelin' Baggy</h1>
-        <button class="btn-glass" onclick="initBooth()">ENTER BOOTH</button>
+        <h1 class="hero-title">FEELIN' BAGGY</h1>
+        <button class="btn-retro" onclick="initBooth()">OPEN BOOTH</button>
     </div>
 
     <div id="screen-interior" class="screen">
@@ -128,25 +146,22 @@
             <div id="timer-overlay"></div>
             <video id="video" autoplay playsinline></video>
         </div>
-        <div id="status" style="margin-top: 15px; font-weight: bold; color: var(--neon-blue);">READY?</div>
-        <button id="start-btn" class="btn-glass" onclick="runSession()">START 3s TIMER</button>
-        
-        <div id="printing-ui" style="display:none; text-align:center;">
-            <div style="color: var(--neon-pink); font-weight: bold; margin-top: 10px;">PRINTING...</div>
-        </div>
+        <div id="status" style="margin-top: 15px; color: var(--neon-blue); font-weight: bold;">READY?</div>
+        <button id="start-btn" class="btn-retro" onclick="runSession()">START AUTO-SNAP</button>
+        <div id="printing-msg" style="display:none; color: var(--retro-yellow); font-weight: bold; margin-top: 10px;">PRINTING FILM...</div>
     </div>
 
     <div id="screen-results" class="screen">
         <div id="strip-print" class="strip-container">
             <div class="photo-slot" id="p1"></div>
             <div class="photo-slot" id="p2"></div>
-            <img src="Artboard 1@3x.png" class="watermark" alt="Logo">
+            <img src="Artboard 1@3x.png" class="sticker-logo" alt="Logo">
             <div class="photo-slot" id="p3"></div>
             <div class="photo-slot" id="p4"></div>
         </div>
-        <div style="display: flex; gap: 10px; margin-top: 15px;">
-            <button class="btn-glass" onclick="downloadPNG()">Save</button>
-            <button class="btn-glass" style="border-color: var(--neon-pink);" onclick="location.reload()">Retry</button>
+        <div style="display: flex; gap: 5px; margin-top: 10px;">
+            <button class="btn-retro" style="background: var(--baggy-teal);" onclick="downloadPNG()">SAVE</button>
+            <button class="btn-retro" style="background: #444;" onclick="location.reload()">RETRY</button>
         </div>
     </div>
 
@@ -157,7 +172,7 @@
         const timer = document.getElementById('timer-overlay');
         const flash = document.getElementById('flash');
         const status = document.getElementById('status');
-        let capturedImages = [];
+        let captured = [];
 
         async function initBooth() {
             try {
@@ -168,31 +183,31 @@
                     document.getElementById('screen-interior').classList.add('active');
                 };
             } catch (err) {
-                alert("Please check camera permissions!");
+                alert("Please enable camera access via HTTPS!");
             }
         }
 
         async function runSession() {
             document.getElementById('start-btn').style.display = 'none';
-            capturedImages = [];
+            captured = [];
 
             for (let i = 1; i <= 4; i++) {
-                status.innerText = `GET READY: ${i}/4`;
+                status.innerText = `POSE ${i}/4`;
                 await startCountdown(3);
                 
                 flash.style.display = 'block';
                 setTimeout(() => flash.style.display = 'none', 100);
                 
                 const data = takePortraitSnap();
-                capturedImages.push(data);
+                captured.push(data);
                 document.getElementById('p' + i).innerHTML = `<img src="${data}">`;
             }
 
-            document.getElementById('printing-ui').style.display = 'block';
+            document.getElementById('printing-msg').style.display = 'block';
             setTimeout(() => {
                 document.getElementById('screen-interior').classList.remove('active');
                 document.getElementById('screen-results').classList.add('active');
-            }, 1500);
+            }, 1200);
         }
 
         function startCountdown(sec) {
@@ -210,22 +225,17 @@
         function takePortraitSnap() {
             const canvas = document.getElementById('hidden-canvas');
             const ctx = canvas.getContext('2d');
-            
-            // Set canvas to Portrait (3:4 ratio)
-            canvas.width = 600;
-            canvas.height = 800;
+            canvas.width = 600; canvas.height = 800; // Portrait
 
-            // Calculate center crop from landscape video
             const sourceWidth = video.videoWidth;
             const sourceHeight = video.videoHeight;
             const aspect = canvas.width / canvas.height;
             let drawWidth = sourceHeight * aspect;
-            let drawHeight = sourceHeight;
             let startX = (sourceWidth - drawWidth) / 2;
 
             ctx.translate(canvas.width, 0);
             ctx.scale(-1, 1);
-            ctx.drawImage(video, startX, 0, drawWidth, drawHeight, 0, 0, canvas.width, canvas.height);
+            ctx.drawImage(video, startX, 0, drawWidth, sourceHeight, 0, 0, canvas.width, canvas.height);
             ctx.setTransform(1, 0, 0, 1, 0, 0);
             
             return canvas.toDataURL('image/png');
@@ -234,15 +244,15 @@
         async function downloadPNG() {
             const final = document.createElement('canvas');
             const fCtx = final.getContext('2d');
-            final.width = 400; final.height = 1000;
+            final.width = 400; final.height = 1100;
             fCtx.fillStyle = "#fefaf0";
-            fCtx.fillRect(0,0,final.width,final.height);
+            fCtx.fillRect(0,0,400,1100);
 
             for(let i=0; i<4; i++) {
                 const img = new Image();
-                img.src = capturedImages[i];
+                img.src = captured[i];
                 await img.decode();
-                fCtx.drawImage(img, 20, 20 + (i * 240), 360, 230);
+                fCtx.drawImage(img, 20, 20 + (i * 265), 360, 250);
             }
 
             const logo = new Image();
@@ -250,14 +260,14 @@
             try {
                 await logo.decode();
                 fCtx.save();
-                fCtx.translate(200, 500);
-                fCtx.rotate(-0.1);
-                fCtx.drawImage(logo, -75, -50, 150, 100);
+                fCtx.translate(200, 550);
+                fCtx.rotate(-0.15);
+                fCtx.drawImage(logo, -50, -35, 100, 70); // Smaller sticker on download
                 fCtx.restore();
             } catch(e) {}
 
             const link = document.createElement('a');
-            link.download = 'feelin-baggy-strip.png';
+            link.download = 'baggy-vibes.png';
             link.href = final.toDataURL();
             link.click();
         }
