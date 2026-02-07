@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feelin' Baggy • Y2K Booth</title>
+    <title>Feelin' Baggy • Retro Booth</title>
     <style>
         :root {
             --neon-pink: #ff00ff;
@@ -11,17 +11,14 @@
             --retro-yellow: #fff300;
             --baggy-teal: #2c5d63;
             --cream: #fefaf0;
-            --glass: rgba(255, 255, 255, 0.1);
         }
 
         body, html {
             margin: 0; padding: 0;
             height: 100%; width: 100%;
             font-family: 'Helvetica Neue', sans-serif;
-            background-color: #0a0a0a;
-            color: white;
             overflow: hidden;
-            display: flex; justify-content: center; align-items: center;
+            background-color: #0a0a0a;
         }
 
         /* 80s Grid Background */
@@ -35,7 +32,6 @@
         .screen { display: none; flex-direction: column; align-items: center; width: 100%; height: 100%; position: absolute; justify-content: center; }
         .active { display: flex; }
 
-        /* --- EXTERIOR --- */
         .hero-title {
             font-size: clamp(3rem, 15vw, 8rem);
             font-weight: 900;
@@ -45,24 +41,28 @@
             text-transform: uppercase;
             text-align: center;
             transform: rotate(-3deg);
+            margin-bottom: 20px;
         }
 
-        /* --- INTERIOR --- */
         .monitor {
             position: relative;
             border: 8px solid #333;
             border-radius: 20px;
             background: #000;
-            box-shadow: 0 0 30px var(--neon-blue);
+            box-shadow: 0 0 40px var(--neon-blue);
             width: 90%;
             max-width: 640px;
         }
 
-        video {
-            width: 100%;
-            display: block;
-            border-radius: 12px;
-            transform: scaleX(-1); /* Mirror */
+        video { width: 100%; display: block; border-radius: 12px; transform: scaleX(-1); }
+
+        /* CRT Scanline Effect */
+        .scanlines {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%);
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 5;
         }
 
         #timer-overlay {
@@ -72,32 +72,12 @@
             color: var(--retro-yellow);
             text-shadow: 0 0 30px #000;
             z-index: 100;
-            pointer-events: none;
         }
 
-        /* --- PRINTING BAR --- */
-        #printing-ui {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-        }
+        #printing-ui { display: none; flex-direction: column; align-items: center; }
+        .progress-container { width: 300px; height: 20px; border: 2px solid var(--neon-blue); margin-top: 15px; }
+        .progress-bar { width: 0%; height: 100%; background: var(--neon-pink); transition: width 0.1s; }
 
-        .progress-container {
-            width: 300px;
-            height: 30px;
-            border: 3px solid var(--neon-blue);
-            padding: 3px;
-            margin-top: 20px;
-        }
-
-        .progress-bar {
-            width: 0%;
-            height: 100%;
-            background: var(--neon-pink);
-            box-shadow: 0 0 15px var(--neon-pink);
-        }
-
-        /* --- STRIP --- */
         .strip-container {
             background: var(--cream);
             padding: 15px;
@@ -111,33 +91,23 @@
         .photo-slot { width: 100%; height: 150px; background: #eee; margin-bottom: 10px; overflow: hidden; border: 1px solid #ddd; }
         .photo-slot img { width: 100%; height: 100%; object-fit: cover; }
 
-        .watermark {
-            display: block;
-            margin: 5px auto 15px auto;
-            width: 80px; /* 50% scale */
-            transform: rotate(-3deg);
-        }
+        .watermark { display: block; margin: 5px auto 15px auto; width: 70px; transform: rotate(-3deg); }
 
         .btn-glass {
-            background: var(--glass);
+            background: rgba(255,255,255,0.1);
             backdrop-filter: blur(10px);
             border: 2px solid white;
             color: white;
             padding: 15px 40px;
             border-radius: 50px;
-            font-size: 1.2rem;
             font-weight: bold;
             text-transform: uppercase;
             cursor: pointer;
             margin-top: 25px;
         }
-
         .btn-glass:hover { background: white; color: black; }
 
-        .flash-fx {
-            position: fixed; top:0; left:0; width:100%; height:100%;
-            background: white; z-index: 1000; display: none;
-        }
+        .flash-fx { position: fixed; top:0; left:0; width:100%; height:100%; background: white; z-index: 1000; display: none; }
     </style>
 </head>
 <body>
@@ -147,22 +117,21 @@
 
     <div id="screen-exterior" class="screen active">
         <div class="hero-title">FEELIN' BAGGY</div>
-        <button class="btn-glass" onclick="initBooth()">Enter Booth</button>
+        <button class="btn-glass" onclick="initBooth()">ENTER BOOTH</button>
     </div>
 
     <div id="screen-interior" class="screen">
         <div class="monitor">
             <div id="timer-overlay"></div>
+            <div class="scanlines"></div>
             <video id="video" autoplay playsinline></video>
         </div>
         <div id="status" style="margin-top: 20px; font-weight: bold; color: var(--neon-blue);">READY?</div>
         <button id="start-btn" class="btn-glass" onclick="runSession()">START 3s TIMER</button>
         
         <div id="printing-ui">
-            <div style="color: var(--neon-pink); font-weight: bold; margin-top: 20px;">PRINTING YOUR STRIP...</div>
-            <div class="progress-container">
-                <div id="bar" class="progress-bar"></div>
-            </div>
+            <div style="color: var(--neon-pink); font-weight: bold; margin-top: 20px;">PRINTING...</div>
+            <div class="progress-container"><div id="bar" class="progress-bar"></div></div>
         </div>
     </div>
 
@@ -176,7 +145,7 @@
         </div>
         <div style="display: flex; gap: 10px;">
             <button class="btn-glass" onclick="downloadPNG()">Download</button>
-            <button class="btn-glass" style="border-color: var(--neon-pink);" onclick="location.reload()">Reset</button>
+            <button class="btn-glass" style="border-color: var(--neon-pink);" onclick="location.reload()">Restart</button>
         </div>
     </div>
 
@@ -190,31 +159,32 @@
         const bar = document.getElementById('bar');
         let capturedImages = [];
 
-        // START WEBCAM
         async function initBooth() {
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                // Constraints set for best compatibility
+                const constraints = { video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } } };
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
                 video.srcObject = stream;
-                // Wait for video to actually start
+                
+                // Final check before switching screens
                 video.onloadedmetadata = () => {
                     document.getElementById('screen-exterior').classList.remove('active');
                     document.getElementById('screen-interior').classList.add('active');
                 };
             } catch (err) {
-                alert("Camera error: " + err.message);
+                console.error(err);
+                alert("CAMERA ERROR: Please make sure you are using HTTPS and have granted camera permissions in your browser settings.");
             }
         }
 
-        // AUTO SESSION
         async function runSession() {
             document.getElementById('start-btn').style.display = 'none';
             capturedImages = [];
 
             for (let i = 1; i <= 4; i++) {
-                status.innerText = `GET READY: ${i}/4`;
+                status.innerText = `POSE FOR PHOTO ${i}/4`;
                 await startCountdown(3);
                 
-                // FLASH & SNAP
                 flash.style.display = 'block';
                 setTimeout(() => flash.style.display = 'none', 100);
                 
@@ -223,20 +193,20 @@
                 document.getElementById('p' + i).innerHTML = `<img src="${data}">`;
             }
 
-            // PRINTING ANIMATION
             status.style.display = 'none';
             document.querySelector('.monitor').style.display = 'none';
             document.getElementById('printing-ui').style.display = 'flex';
             
             let progress = 0;
             const interval = setInterval(() => {
-                progress += 5;
+                progress += 2;
                 bar.style.width = progress + '%';
                 if (progress >= 100) {
                     clearInterval(interval);
-                    showResults();
+                    document.getElementById('screen-interior').classList.remove('active');
+                    document.getElementById('screen-results').classList.add('active');
                 }
-            }, 100);
+            }, 40);
         }
 
         function startCountdown(sec) {
@@ -259,17 +229,11 @@
         function takeSnap() {
             const canvas = document.getElementById('hidden-canvas');
             const ctx = canvas.getContext('2d');
-            // Mirror logic
             ctx.translate(canvas.width, 0);
             ctx.scale(-1, 1);
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
             ctx.setTransform(1, 0, 0, 1, 0, 0);
             return canvas.toDataURL('image/png');
-        }
-
-        function showResults() {
-            document.getElementById('screen-interior').classList.remove('active');
-            document.getElementById('screen-results').classList.add('active');
         }
 
         async function downloadPNG() {
