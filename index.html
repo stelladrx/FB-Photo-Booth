@@ -3,182 +3,197 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feelin' Baggy • Photobooth</title>
+    <title>Feelin' Baggy • Retro Booth</title>
     <style>
         :root {
             --neon-pink: #ff00ff;
             --neon-blue: #00f3ff;
+            --retro-yellow: #fff300;
             --baggy-teal: #2c5d63;
             --cream: #fefaf0;
-            --glass: rgba(255, 255, 255, 0.1);
         }
 
         body, html {
             margin: 0; padding: 0;
             height: 100%; width: 100%;
-            background: #0a0a0a;
-            background-image: radial-gradient(var(--baggy-teal) 0.5px, transparent 0.5px);
-            background-size: 30px 30px;
             font-family: 'Helvetica Neue', sans-serif;
-            color: white;
             overflow: hidden;
-            display: flex; justify-content: center; align-items: center;
+            background-color: #1a1a1a;
+            /* 80s Memphis Pattern Background */
+            background-image: 
+                radial-gradient(var(--neon-pink) 2px, transparent 2px),
+                linear-gradient(45deg, transparent 48%, var(--neon-blue) 50%, transparent 52%);
+            background-size: 40px 40px, 100px 100px;
         }
 
-        .screen { display: none; flex-direction: column; align-items: center; width: 100%; height: 100%; position: absolute; }
-        .active { display: flex; animation: fadeIn 0.5s ease; }
+        .screen { display: none; flex-direction: column; align-items: center; width: 100%; height: 100%; position: absolute; justify-content: center; }
+        .active { display: flex; animation: slideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
         /* --- EXTERIOR --- */
         #screen-exterior {
-            background: linear-gradient(135deg, #ff8c42, #ff00ff);
-            justify-content: center;
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://www.transparenttextures.com/patterns/cubes.png');
+            background-color: var(--baggy-teal);
         }
 
-        .marquee {
-            font-size: 4rem;
+        .hero-title {
+            font-size: clamp(3rem, 10vw, 6rem);
             font-weight: 900;
+            color: var(--retro-yellow);
+            text-shadow: 4px 4px 0px var(--neon-pink), 8px 8px 0px var(--neon-blue);
             text-transform: uppercase;
-            font-style: italic;
-            -webkit-text-stroke: 2px white;
-            color: transparent;
-            text-shadow: 5px 5px var(--baggy-teal);
-            margin-bottom: 30px;
+            letter-spacing: -2px;
+            margin-bottom: 20px;
+            text-align: center;
         }
 
         /* --- INTERIOR --- */
-        .camera-container {
-            position: relative;
-            border-radius: 40px;
-            padding: 15px;
-            background: var(--glass);
-            backdrop-filter: blur(10px);
-            border: 2px solid var(--neon-blue);
-            box-shadow: 0 0 30px var(--neon-blue);
+        #screen-interior {
+            background: #222;
+            border: 15px solid #333; /* Booth Walls */
+            box-shadow: inset 0 0 100px #000;
         }
 
-        /* CRT Scanline Effect */
-        .camera-container::after {
-            content: " ";
-            position: absolute; top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            background-size: 100% 4px, 3px 100%;
-            pointer-events: none;
-            border-radius: 30px;
+        .camera-ring {
+            position: relative;
+            padding: 10px;
+            border-radius: 20px;
+            background: linear-gradient(var(--neon-blue), var(--neon-pink));
+            box-shadow: 0 0 50px rgba(0, 243, 255, 0.3);
         }
 
         video {
-            width: 500px;
-            height: 375px;
-            object-fit: cover;
-            border-radius: 25px;
+            width: 480px;
+            height: 360px;
+            background: #000;
+            border-radius: 10px;
             transform: scaleX(-1);
+            display: block;
+        }
+
+        /* Scanline Overlay */
+        .scanlines {
+            position: absolute; top:0; left:0; width:100%; height:100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            background-size: 100% 3px, 3px 100%;
+            pointer-events: none;
         }
 
         /* --- THE STRIP --- */
-        .strip-wrapper {
-            position: relative;
+        .strip-drop {
             background: var(--cream);
-            padding: 20px;
-            width: 260px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            animation: stripDrop 1.2s cubic-bezier(0.23, 1, 0.32, 1);
+            padding: 15px;
+            width: 220px;
+            position: relative;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+            animation: fallIn 1.4s ease-out;
+            border-bottom: 4px dashed #ccc;
         }
 
-        @keyframes stripDrop {
-            0% { transform: translateY(-120%) rotate(-10deg); }
-            100% { transform: translateY(0) rotate(0deg); }
-        }
+        @keyframes fallIn { from { transform: translateY(-120%); } to { transform: translateY(0); } }
 
-        .photo-frame {
+        .photo-slot {
             width: 100%;
-            height: 180px;
-            background: #ddd;
-            margin-bottom: 15px;
-            border: 1px solid #aaa;
+            height: 150px;
+            background: #eee;
+            margin-bottom: 12px;
             overflow: hidden;
+            border: 1px solid #ddd;
         }
 
-        .photo-frame img { width: 100%; height: 100%; object-fit: cover; }
+        .photo-slot img { 
+            width: 100%; height: 100%; object-fit: cover; 
+            filter: contrast(1.1) brightness(1.05) saturate(1.2);
+        }
 
-        /* THE OVERLAY LOGO */
-        .overlay-logo {
+        /* SMALL LOGO OVERLAY */
+        .watermark-logo {
             position: absolute;
-            top: 45%;
+            top: 48%; /* Positioned between 2nd and 3rd pic */
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 160px;
-            z-index: 10;
-            filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3));
+            width: 80px; /* 50% Smaller than before */
+            z-index: 5;
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.2));
+            pointer-events: none;
         }
 
         /* --- BUTTONS --- */
-        .btn-pill {
-            background: white;
-            color: black;
-            border: none;
-            padding: 18px 45px;
-            border-radius: 50px;
-            font-weight: bold;
+        .btn-retro {
+            background: var(--retro-yellow);
+            color: #000;
+            border: 4px solid #000;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: 900;
             text-transform: uppercase;
-            letter-spacing: 2px;
             cursor: pointer;
-            transition: 0.3s;
-            margin: 20px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            box-shadow: 6px 6px 0px #000;
+            transition: 0.1s;
         }
 
-        .btn-pill:hover { transform: scale(1.05); background: var(--neon-blue); }
+        .btn-retro:hover { transform: translate(-2px, -2px); box-shadow: 8px 8px 0px #000; }
+        .btn-retro:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px #000; }
 
-        #snap-btn { background: var(--neon-pink); color: white; }
+        .grain-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/stardust.png');
+            opacity: 0.15; pointer-events: none; z-index: 100;
+        }
     </style>
 </head>
 <body>
 
+    <div class="grain-overlay"></div>
+
     <div id="screen-exterior" class="screen active">
-        <div class="marquee">Feelin' Baggy</div>
-        <button class="btn-pill" onclick="enterBooth()">Enter Booth</button>
+        <div class="hero-title">Feelin'<br>Baggy</div>
+        <button class="btn-retro" onclick="startBooth()">Enter the Booth</button>
     </div>
 
     <div id="screen-interior" class="screen">
-        <div class="camera-container">
+        <div class="camera-ring">
             <video id="video" autoplay playsinline></video>
+            <div class="scanlines"></div>
         </div>
-        <div style="margin-top: 20px; font-size: 1.5rem;" id="counter">SHOT 1/4</div>
-        <button id="snap-btn" class="btn-pill" onclick="takePhoto()">Snap</button>
-        <button id="done-btn" class="btn-pill" style="display:none;" onclick="showStrip()">Print Strip</button>
+        <div style="margin: 20px; font-weight: bold; color: var(--neon-blue); text-shadow: 2px 2px #000;">
+            CAPTURING: <span id="counter">0</span>/4
+        </div>
+        <button id="snap-btn" class="btn-retro" onclick="snap()">SNAP!</button>
+        <button id="print-btn" class="btn-retro" style="display:none; background: var(--neon-pink); color: white;" onclick="renderResults()">PRINT STRIP</button>
     </div>
 
     <div id="screen-results" class="screen">
-        <div class="strip-wrapper" id="capture-area">
-            <div class="photo-frame" id="p1"></div>
-            <div class="photo-frame" id="p2"></div>
-            <img src="Artboard 1@3x.png" class="overlay-logo" alt="Logo">
-            <div class="photo-frame" id="p3"></div>
-            <div class="photo-frame" id="p4"></div>
+        <div class="strip-drop" id="final-strip">
+            <div class="photo-slot" id="s1"></div>
+            <div class="photo-slot" id="s2"></div>
+            <img src="Artboard 1@3x.png" class="watermark-logo" alt="Logo">
+            <div class="photo-slot" id="s3"></div>
+            <div class="photo-slot" id="s4"></div>
         </div>
-        <div style="display:flex;">
-            <button class="btn-pill" onclick="downloadImage()">Save to Phone</button>
-            <button class="btn-pill" style="background:#333; color:white;" onclick="location.reload()">Reset</button>
+        <div style="margin-top: 30px; display: flex; gap: 15px;">
+            <button class="btn-retro" style="background: var(--neon-blue);" onclick="downloadStrip()">SAVE PNG</button>
+            <button class="btn-retro" style="background: #eee;" onclick="location.reload()">AGAIN?</button>
         </div>
     </div>
 
-    <canvas id="main-canvas" width="800" height="600" style="display:none;"></canvas>
+    <canvas id="hidden-canvas" width="600" height="450" style="display:none;"></canvas>
 
     <script>
         let photos = [];
         const video = document.getElementById('video');
 
-        function enterBooth() {
+        function startBooth() {
             document.getElementById('screen-exterior').classList.remove('active');
             document.getElementById('screen-interior').classList.add('active');
             navigator.mediaDevices.getUserMedia({ video: true }).then(s => video.srcObject = s);
         }
 
-        function takePhoto() {
+        function snap() {
             if (photos.length >= 4) return;
-            const canvas = document.getElementById('main-canvas');
+            const canvas = document.getElementById('hidden-canvas');
             const ctx = canvas.getContext('2d');
             ctx.translate(canvas.width, 0);
             ctx.scale(-1, 1);
@@ -188,47 +203,47 @@
             const data = canvas.toDataURL('image/png');
             photos.push(data);
             
-            document.getElementById('p' + photos.length).innerHTML = `<img src="${data}">`;
-            document.getElementById('counter').innerText = `SHOT ${photos.length + 1}/4`;
+            document.getElementById('s' + photos.length).innerHTML = `<img src="${data}">`;
+            document.getElementById('counter').innerText = photos.length;
 
             if (photos.length === 4) {
                 document.getElementById('snap-btn').style.display = 'none';
-                document.getElementById('done-btn').style.display = 'block';
+                document.getElementById('print-btn').style.display = 'block';
             }
         }
 
-        function showStrip() {
+        function renderResults() {
             document.getElementById('screen-interior').classList.remove('active');
             document.getElementById('screen-results').classList.add('active');
         }
 
-        async function downloadImage() {
-            const finalCanvas = document.createElement('canvas');
-            const fCtx = finalCanvas.getContext('2d');
-            finalCanvas.width = 500;
-            finalCanvas.height = 1400;
+        async function downloadStrip() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 440;
+            canvas.height = 1200;
 
-            fCtx.fillStyle = "#fefaf0";
-            fCtx.fillRect(0,0,500,1400);
+            ctx.fillStyle = "#fefaf0"; // Cream background
+            ctx.fillRect(0,0,440,1200);
 
             for(let i=0; i<4; i++) {
                 const img = new Image();
                 img.src = photos[i];
                 await img.decode();
-                fCtx.drawImage(img, 25, 25 + (i * 330), 450, 310);
+                ctx.drawImage(img, 20, 20 + (i * 290), 400, 280);
             }
 
-            // Draw Logo overlay on the final canvas
+            // Draw Logo 50% smaller
             const logo = new Image();
             logo.src = 'Artboard 1@3x.png';
             try {
                 await logo.decode();
-                fCtx.drawImage(logo, 100, 600, 300, 150);
+                ctx.drawImage(logo, 145, 530, 150, 80); // Scaled down
             } catch(e){}
 
             const link = document.createElement('a');
-            link.download = 'baggy-vibe.png';
-            link.href = finalCanvas.toDataURL();
+            link.download = 'feelin-baggy-strip.png';
+            link.href = canvas.toDataURL();
             link.click();
         }
     </script>
